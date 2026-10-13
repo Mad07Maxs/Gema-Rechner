@@ -1,68 +1,165 @@
-<!DOCTYPE html>
+from pathlib import Path
+
+html = r'''<!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <title>GEMA Rechner - Amateurtheater (Tarif BM I)</title>
-    <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f9; margin: 0; padding: 20px; }
-        .container { max-width: 500px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); margin: auto; }
-        h2 { color: #333; text-align: center; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
-        input[type="number"] { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-        .result { margin-top: 20px; padding: 15px; background: #eef2f7; border-radius: 4px; border-left: 4px solid #0056b3; }
-        .result p { margin: 8px 0; font-size: 15px; }
-        .total { font-weight: bold; font-size: 18px; color: #0056b3; }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GEMA-Kostenrechner – Tarif BM ab 01.09.2026</title>
+<style>
+:root{--bg:#f4f6fa;--card:#fff;--ink:#172033;--muted:#647089;--line:#dfe5ef;--blue:#3659d9;--purple:#805ad5;--orange:#e59a35;--green:#16866a;--red:#bd5360;--teal:#188b8b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+main{max-width:1160px;margin:0 auto;padding:28px 18px 48px}.hero{background:linear-gradient(120deg,#18284c,#3659d9);color:#fff;padding:28px;border-radius:20px;margin-bottom:20px}
+.hero h1{font-size:clamp(1.7rem,4vw,2.5rem);margin:0 0 8px}.hero p{margin:0;color:#e1e8ff;max-width:800px}
+.layout{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(320px,.95fr);gap:18px;align-items:start}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 5px 20px #18284c0a}
+h2{font-size:1.15rem;margin:0 0 16px}h3{font-size:1rem;margin:22px 0 10px}.fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{display:block;font-weight:650;font-size:.9rem;margin-bottom:6px}.help{display:block;font-size:.78rem;color:var(--muted);font-weight:400;margin-top:4px}
+input,select{width:100%;padding:11px 12px;border:1px solid #cbd4e2;border-radius:9px;font:inherit;background:#fff;color:var(--ink)}input:focus,select:focus{outline:2px solid #9db0ff;border-color:var(--blue)}
+.check{display:flex;align-items:flex-start;gap:10px;margin:13px 0}.check input{width:18px;height:18px;margin-top:3px}.check label{margin:0;font-weight:550}
+.result{background:#f0f4ff;border:1px solid #dbe4ff;border-radius:13px;padding:17px;margin-bottom:14px}.result .eyebrow{color:#4e5d83;font-size:.84rem;font-weight:650}.total{font-size:2.35rem;font-weight:800;letter-spacing:-.04em;margin:3px 0}.sub{color:var(--muted);font-size:.9rem}
+.rows{display:grid;gap:0}.line{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid var(--line)}.line:last-child{border-bottom:0}.line span:first-child{color:#46516a}.line strong{font-variant-numeric:tabular-nums;white-space:nowrap}.negative{color:var(--green)}
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}.chart-card{border:1px solid var(--line);border-radius:12px;padding:14px}.chart-card h3{margin:0 0 12px}.chart-wrap{display:grid;grid-template-columns:145px 1fr;align-items:center;gap:12px}
+.donut{width:140px;height:140px;border-radius:50%;position:relative;margin:auto;background:#e5e9f2}.donut:after{content:"";position:absolute;inset:24px;border-radius:50%;background:white}.donut-center{position:absolute;z-index:1;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;font-size:.75rem;color:var(--muted)}.donut-center strong{font-size:1rem;color:var(--ink)}
+.legend{display:grid;gap:9px}.legend-item{display:grid;grid-template-columns:10px 1fr;gap:7px;align-items:start;font-size:.8rem}.legend-item strong{grid-column:2;font-variant-numeric:tabular-nums;font-size:.82rem}.swatch{width:10px;height:10px;border-radius:3px;margin-top:4px}
+.note{background:#fff8e8;border:1px solid #f1dfb4;padding:13px 15px;border-radius:10px;color:#654c19;font-size:.87rem;margin-top:16px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}button{border:0;border-radius:9px;padding:11px 15px;font:inherit;font-weight:700;cursor:pointer}.primary{background:var(--blue);color:white}.secondary{background:#edf0f7;color:var(--ink)}
+.fine{color:var(--muted);font-size:.8rem;margin-top:18px}.links a{color:var(--blue)}.wide{margin-top:18px}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.chart-grid{grid-template-columns:1fr}}
+@media(max-width:520px){.fields{grid-template-columns:1fr}.card{padding:16px}.hero{padding:22px}.chart-wrap{grid-template-columns:125px 1fr}.donut{width:120px;height:120px}.donut:after{inset:21px}}
+@media print{body{background:white}.hero{background:#18284c!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.actions{display:none}.layout{grid-template-columns:1fr 1fr}.card{box-shadow:none;break-inside:avoid}}
+</style>
 </head>
 <body>
-
-<div class="container">
-    <h2>GEMA-Kostenrechner (Theater)</h2>
-    
-    <div class="form-group">
-        <label for="gemaNetto">GEMA-Vergütung (netto in €):</label>
-        <input type="number" id="gemaNetto" value="24.91" step="0.01" oninput="berechneGema()">
-    </div>
-
-    <div class="form-group">
-        <label for="bdatRabatt">BDAT / GSVT-Nachlass (netto in €):</label>
-        <input type="number" id="bdatRabatt" value="9.96" step="0.01" oninput="berechneGema()">
-    </div>
-
-    <div class="result">
-        <p>GEMA Vergütung: <span id="resGema">24,91</span> €[span_0](start_span)[span_0](end_span)</p>
-        <p>GVL Vergütung (100%): <span id="resGvl">24,91</span> €[span_1](start_span)[span_1](end_span)</p>
-        <p>Zwischensumme netto: <span id="resZwischen">39,86</span> €[span_2](start_span)[span_2](end_span)</p>
-        <p>Umsatzsteuer (7%): <span id="resMwst">2,79</span> €</p>
-        <p class="total">Gesamtbetrag (brutto): <span id="resBrutto">42,65</span> €</p>
-    </div>
+<main>
+<header class="hero">
+<h1>GEMA-Kostenrechner</h1>
+<p>Vorab-Kalkulation für Sprechtheater nach dem von dir bereitgestellten Tarif BM, gültig ab 1. September 2026. Mit GVL-Schätzung und zwei Kuchendiagrammen.</p>
+</header>
+<div class="layout">
+<section class="card">
+<h2>Angaben zur Produktion</h2>
+<div class="fields">
+<div><label for="shows">Anzahl Vorstellungen insgesamt</label><input id="shows" type="number" min="1" step="1" value="13"></div>
+<div><label for="minutes">Gesamtmusikdauer je Vorstellung (Minuten)</label><input id="minutes" type="number" min="0" step="0.1" value="4.5"><span class="help">4 Minuten 30 Sekunden = 4,5 Minuten.</span></div>
+<div><label for="basis">Berechnungsgrundlage je Vorstellung netto (€)</label><input id="basis" type="number" min="0" step="0.01" value="720"><span class="help">Netto-Karteneinnahmen plus ggf. pauschaler 7%-Aufschlag für Werbung/Sponsoring.</span></div>
+<div><label for="audience">Personen je Vorstellung</label><input id="audience" type="number" min="1" step="1" value="90"></div>
+<div><label for="discountExtra">Zusätzlicher Gesamtvertragsnachlass (%)</label><input id="discountExtra" type="number" min="0" max="100" step="0.1" value="0"><span class="help">Nur eintragen, wenn eure Organisation diesen Nachlass wirklich erhält.</span></div>
+<div><label for="vat">Umsatzsteuer (%)</label><input id="vat" type="number" min="0" max="100" step="0.1" value="7"></div>
 </div>
-
+<h3>Vertrag und Nutzung</h3>
+<div class="check"><input id="annual" type="checkbox"><label for="annual">Jahrespauschalvertrag für die Spielzeit vorhanden<span class="help">Tarifnachlass laut BM: bis 15 Veranstaltungen 0 %, ab der 16. 10 %, ab der 31. 14,5 % – bei fristgerechter Online-Meldung.</span></label></div>
+<div class="check"><input id="gvl" type="checkbox" checked><label for="gvl">Veröffentlichte Tonträger werden abgespielt (Laptop, USB, CD etc.)<span class="help">GVL wird hier überschlägig mit 100 % der GEMA-Gebühr angesetzt. Bitte gesondert prüfen.</span></label></div>
+<div class="actions"><button class="primary" id="reset">Beispielwerte wiederherstellen</button><button class="secondary" id="print">Drucken / als PDF speichern</button></div>
+<p class="fine">Die Gebühr wird je Vorstellung berechnet und dann mit der Anzahl der Vorstellungen multipliziert. Der Rechner verwendet die im Tarifblatt genannten Werte: 25,84 € Mindestvergütung, 0,470 % je angefangene 5 Musikminuten und 4,70 % bei mehr als 45 Minuten.</p>
+</section>
+<section class="card">
+<h2>Voraussichtliche Rechnung</h2>
+<div class="result"><div class="eyebrow">Geschätzter Gesamtbetrag brutto</div><div class="total" id="gross">–</div><div class="sub" id="perShow">– je Vorstellung</div></div>
+<div class="rows">
+<div class="line"><span>GEMA gesamt (netto)</span><strong id="gema">–</strong></div>
+<div class="line"><span>GVL gesamt (netto, geschätzt)</span><strong id="gvlAmount">–</strong></div>
+<div class="line"><span>Zwischensumme</span><strong id="subtotal">–</strong></div>
+<div class="line"><span>Jahres-/Gesamtvertragsnachlass</span><strong class="negative" id="discountAmount">–</strong></div>
+<div class="line"><span>Summe netto</span><strong id="net">–</strong></div>
+<div class="line"><span>Umsatzsteuer</span><strong id="tax">–</strong></div>
+</div>
+<div class="note" id="explanation">–</div>
+</section>
+</div>
+<section class="card wide">
+<h2>Kostenaufteilung als Kuchendiagramme</h2>
+<div class="chart-grid">
+<div class="chart-card">
+<h3>1. Woraus besteht die geschätzte Rechnung?</h3>
+<div class="chart-wrap"><div class="donut" id="invoiceDonut"><div class="donut-center"><span>Rechnung</span><strong id="invoiceTotal">–</strong></div></div><div class="legend" id="invoiceLegend"></div></div>
+</div>
+<div class="chart-card">
+<h3>2. Wie kommt der GEMA-Betrag zustande?</h3>
+<div class="chart-wrap"><div class="donut" id="gemaDonut"><div class="donut-center"><span>GEMA</span><strong id="gemaTotalChart">–</strong></div></div><div class="legend" id="gemaLegend"></div></div>
+<p class="fine">Das Diagramm zerlegt den GEMA-Betrag in den tariflich berechneten Anteil und – falls der Mindestbetrag höher ist – den zusätzlichen Anteil durch die Mindestvergütung. Es ist eine Darstellung der Tarifrechnung, keine separate Abrechnung einzelner Bestandteile.</p>
+</div>
+</div>
+</section>
+<section class="card wide">
+<h2>So funktioniert die Berechnung laut Tarif BM (ab 01.09.2026)</h2>
+<div class="rows">
+<div class="line"><span>Bis einschließlich 1,5 Minuten Musik</span><strong>25,84 € je Vorstellung</strong></div>
+<div class="line"><span>Mehr als 1,5 Minuten, je angefangene 5 Minuten</span><strong>0,470 % der Berechnungsgrundlage</strong></div>
+<div class="line"><span>Mehr als 45 Minuten Musik</span><strong>4,70 % der Berechnungsgrundlage</strong></div>
+<div class="line"><span>Mindestvergütung bis 150 Personen</span><strong>25,84 € je Vorstellung</strong></div>
+<div class="line"><span>Mindestvergütung bis 300 Personen</span><strong>51,68 € je Vorstellung</strong></div>
+<div class="line"><span>Je weitere angefangene 150 Personen</span><strong>+25,84 € je Vorstellung</strong></div>
+</div>
+<div class="note">Berechnungsgrundlage laut deinem Tariftext: Netto-Karteneinnahmen (ohne Umsatzsteuer und externe Vorverkaufs-/Systemgebühren). Steuerpflichtige Werbe- oder Sponsoringeinnahmen bzw. wirtschaftlich gleichwertige Vorteile werden pauschal durch einen Aufschlag von 7 % auf diese Grundlage berücksichtigt, wenn solche Einnahmen erzielt werden und gegenüber der GEMA anzugeben sind. Gib oben die bereits passende Berechnungsgrundlage ein; den 7%-Aufschlag nicht doppelt addieren.</div>
+<p class="links">Grundlage: der von dir bereitgestellte Tariftext „Tarif BM – Sprechtheater“, Stand 01.09.2026.</p>
+<p class="fine">Dies ist eine Schätzung und keine verbindliche GEMA-Abrechnung. Der GVL-Anteil ist nicht Teil des hier eingefügten BM-Tariftextes und wird nur als konfigurierbare Schätzung gezeigt. Bei mehr als 45 Minuten verwendet der Rechner 4,70 % der Berechnungsgrundlage und vergleicht diesen Betrag mit der Mindestvergütung. Vertrags- und Sonderkonditionen können das Ergebnis verändern.</p>
+</section>
+</main>
 <script>
-function berechneGema() {
-    let gema = parseFloat(document.getElementById('gemaNetto').value) || 0;
-    let rabatt = parseFloat(document.getElementById('bdatRabatt').value) || 0;
-    
-    // GVL entspricht immer 100% der GEMA-Vergütung laut Rechnung
-    let gvl = gema; 
-    
-    let zwischensumme = (gema + gvl) - rabatt;
-    if (zwischensumme < 0) zwischensumme = 0;
-    
-    let mwst = zwischensumme * 0.07;
-    let brutto = zwischensumme + mwst;
-
-    document.getElementById('resGema').innerText = gema.toFixed(2).replace('.', ',');
-    document.getElementById('resGvl').innerText = gvl.toFixed(2).replace('.', ',');
-    document.getElementById('resZwischen').innerText = zwischensumme.toFixed(2).replace('.', ',');
-    document.getElementById('resMwst').innerText = mwst.toFixed(2).replace('.', ',');
-    document.getElementById('resBrutto').innerText = brutto.toFixed(2).replace('.', ',');
+const $=id=>document.getElementById(id);
+const euro=n=>new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR'}).format(n);
+const num=id=>Math.max(0,Number($(id).value)||0);
+const colors={gema:'#3659d9',gvl:'#805ad5',tax:'#e59a35',calculated:'#188b8b',minimum:'#e59a35'};
+function setDonut(id,legendId,centerId,centerLabel,parts){
+ const total=parts.reduce((s,p)=>s+p.value,0);
+ let cursor=0;
+ const active=parts.filter(p=>p.value>0);
+ const stops=active.map(p=>{const start=cursor;cursor+=total?p.value/total*360:0;return `${p.color} ${start}deg ${cursor}deg`;});
+ $(id).style.background=stops.length?`conic-gradient(${stops.join(',')})`:'#e5e9f2';
+ $(centerId).textContent=euro(total);
+ $(legendId).innerHTML=active.length?active.map(p=>`<div class="legend-item"><span class="swatch" style="background:${p.color}"></span><span>${p.name}</span><strong>${euro(p.value)}${total>0?' · '+(p.value/total*100).toLocaleString('de-DE',{maximumFractionDigits:1})+' %':''}</strong></div>`).join(''):'Keine Kosten';
 }
-
-// Initialer Aufruf
-berechneGema();
+function calculate(){
+ const shows=Math.max(1,Math.floor(num('shows')));
+ const mins=num('minutes'),basis=num('basis'),audience=Math.max(1,Math.floor(num('audience')));
+ const vatPct=num('vat'),extraDiscount=Math.min(100,num('discountExtra'));
+ const blocks=Math.ceil(mins/5);
+ let tariffCalculated=0;
+ if(mins<=1.5) tariffCalculated=25.84;
+ else if(mins>45) tariffCalculated=basis*0.047;
+ else tariffCalculated=basis*0.00470*blocks;
+ const minBlocks=Math.ceil(audience/150);
+ const minimum=mins<=1.5?25.84:25.84*minBlocks;
+ const gemaPer=Math.max(tariffCalculated,minimum);
+ const minimumContribution=Math.max(0,gemaPer-tariffCalculated);
+ const annualDiscountEnabled=$('annual').checked;
+ const annualPct=annualDiscountEnabled?(shows>=31?14.5:shows>=16?10:0):0;
+ const combinedDiscount=1-(1-annualPct/100)*(1-extraDiscount/100);
+ const gema=gemaPer*shows;
+ const gvl=$('gvl').checked?gema:0;
+ const subtotal=gema+gvl;
+ const discount=subtotal*combinedDiscount;
+ const net=Math.max(0,subtotal-discount);
+ const tax=net*vatPct/100;
+ const gross=net+tax;
+ $('gross').textContent=euro(gross);
+ $('perShow').textContent=euro(gross/shows)+' je Vorstellung · '+shows+' Vorstellungen';
+ $('gema').textContent=euro(gema);
+ $('gvlAmount').textContent=euro(gvl);
+ $('subtotal').textContent=euro(subtotal);
+ $('discountAmount').textContent='− '+euro(discount);
+ $('net').textContent=euro(net);
+ $('tax').textContent=euro(tax);
+ const annualText=annualDiscountEnabled?`Jahrespauschalvertragsnachlass: ${annualPct} % (${shows} Vorstellungen).`:'Kein Jahrespauschalvertragsnachlass angesetzt.';
+ $('explanation').textContent=`Pro Vorstellung: tariflich berechnet ${euro(tariffCalculated)}; Mindestvergütung ${euro(minimum)}; angesetzte GEMA-Gebühr ${euro(gemaPer)}. ${mins<=1.5?'Bis 1,5 Minuten gilt die Pauschale von 25,84 €.':mins>45?'Bei mehr als 45 Minuten gelten 4,70 % der Berechnungsgrundlage.':`${blocks} angefangene 5-Minuten-Blöcke × 0,470 % der Berechnungsgrundlage.`} ${annualText} ${extraDiscount>0?`Zusätzlicher Gesamtvertragsnachlass: ${extraDiscount} %; kombiniert rechnerisch.`:''} ${$('gvl').checked?'GVL überschlägig mit 100 % der GEMA angesetzt.':'GVL nicht eingerechnet.'}`;
+ setDonut('invoiceDonut','invoiceLegend','invoiceTotal','Rechnung',[
+  {name:'GEMA nach Nachlass (netto)',value:gema*(1-combinedDiscount),color:colors.gema},
+  {name:'GVL nach Nachlass (netto)',value:gvl*(1-combinedDiscount),color:colors.gvl},
+  {name:'Umsatzsteuer',value:tax,color:colors.tax}
+ ]);
+ setDonut('gemaDonut','gemaLegend','gemaTotalChart','GEMA',[
+  {name:'Tariflich berechneter Anteil',value:Math.min(tariffCalculated,gemaPer),color:colors.calculated},
+  {name:'Zusatz durch Mindestvergütung',value:minimumContribution,color:colors.minimum}
+ ]);
+}
+document.querySelectorAll('input').forEach(el=>el.addEventListener('input',calculate));
+$('reset').addEventListener('click',()=>{
+ $('shows').value=13;$('minutes').value=4.5;$('basis').value=720;$('audience').value=90;$('discountExtra').value=0;$('vat').value=7;$('annual').checked=false;$('gvl').checked=true;calculate();
+});
+$('print').addEventListener('click',()=>window.print());
+calculate();
 </script>
-
-</body>
-</html>
+</body></html>'''
+path=Path("/mnt/data/gema_kostenrechner_theater.html")
+path.write_text(html, encoding="utf-8")
+print(f"Erstellt: {path} ({path.stat().st_size} Bytes)")
